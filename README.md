@@ -37,9 +37,16 @@ Später geplant: Adapter für OXI E16 auf demselben `core.lua`.
 
 ## Upload auf die Electra One
 
-1. Gerät per USB verbinden, in der Electra One App verbinden, Bank/Slot wählen.
-2. `electra/preset.json` als Preset laden.
-3. Lua-Script in denselben Slot laden – entweder
+Wichtig: `electra/preset.json` ist ein **Preset-File** (Format-Version 3, wie es die
+Firmware liest). Es ist **kein Project-File** – „Import Project" im Editor erwartet das
+Project-Format (`.eproj`) und lehnt Preset-JSON ab.
+
+1. Gerät per USB verbinden, in der Electra One App (Chrome/Edge) verbinden, Bank/Slot wählen.
+2. Preset in die eigene Preset-Bibliothek importieren (`electra/preset.json`, ggf. als `.epr`)
+   und von dort per **„Upload to Slot"** / **„Send to Electra"** in den gewählten Slot laden.
+   Alternativ kann das Preset-JSON per SysEx-File-Transfer direkt in einen Slot
+   hochgeladen werden.
+3. Lua-Script in denselben Slot laden (im Editor am Script des Presets) – entweder
    - `electra/main_standalone.lua` (einfach, Kern eingebettet), oder
    - `electra/main.lua` + `electra/core.lua` als Zusatzdatei.
 4. Slot am Gerät auswählen.
@@ -78,7 +85,10 @@ python3 build_standalone.py  # → electra/main_standalone.lua
 
 ## Offene Punkte für den Hardware-Test
 
-- JSON-Schema-Details (`devices: []`, `controlSetId`, `variant: "thin"`, Bounds-Rendering)
+- ~~JSON-Schema-Details~~ – erledigt: Values tragen jetzt `virtual`-Messages mit
+  eindeutiger `parameterNumber`, ein Device ist deklariert, ACT/LEN/CH/BPM liegen auf
+  Pot 1–4 (restliche Controls Touch); Layout ist 800×480 (Electra One mini; auf dem
+  mk2 mit 1024×600 erscheint es oben links)
 - exakte `valuesChanged`-Form (beide Formen werden behandelt), Timer-/`transport.*`-Namen
   (per `pcall` defensiv gekapselt), ob die interne Controller-Clock sauber in
   `transport.onClock` ankommt

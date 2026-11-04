@@ -3,7 +3,26 @@ import json
 W, H = 800, 480
 controls = []
 
-def ctrl(cid, ctype, name, bounds, vmin, vmax, color, variant=None, formatter=None):
+PARAM = 0
+
+def next_param():
+    global PARAM
+    PARAM += 1
+    return PARAM
+
+def ctrl(cid, ctype, name, bounds, vmin, vmax, color, variant=None, formatter=None, potId=None):
+    value = {
+        "id": "value",
+        "min": vmin,
+        "max": vmax,
+        "message": {
+            "deviceId": 1,
+            "type": "virtual",
+            "parameterNumber": next_param(),
+        },
+    }
+    if formatter:
+        value["formatter"] = formatter
     c = {
         "id": cid,
         "type": ctype,
@@ -13,12 +32,12 @@ def ctrl(cid, ctype, name, bounds, vmin, vmax, color, variant=None, formatter=No
         "pageId": 1,
         "controlSetId": 1,
         "visible": True,
-        "values": [{"id": "value", "min": vmin, "max": vmax}],
+        "values": [value],
     }
     if variant:
         c["variant"] = variant
-    if formatter:
-        c["values"][0]["formatter"] = formatter
+    if potId:
+        c["inputs"] = [{"potId": potId, "valueId": "value"}]
     controls.append(c)
 
 PC_NAMES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
@@ -41,10 +60,10 @@ for pc in range(12):
 for octv in range(11):
     ctrl(401 + octv, "fader", "O%d" % octv, [6 + octv * 68, 410, 62, 64], 0, 127, "B388FF", variant="thin")
 
-ctrl(501, "fader", "ACT", [8, 8, 150, 60], 0, 127, "FF5252")
-ctrl(502, "fader", "LEN", [166, 8, 70, 60], 1, 16, "FFD740")
-ctrl(503, "fader", "CH", [244, 8, 70, 60], 0, 15, "EEEEEE")
-ctrl(504, "fader", "BPM", [634, 8, 70, 60], 30, 300, "FF9100")
+ctrl(501, "fader", "ACT", [8, 8, 150, 60], 0, 127, "FF5252", potId=1)
+ctrl(502, "fader", "LEN", [166, 8, 70, 60], 1, 16, "FFD740", potId=2)
+ctrl(503, "fader", "CH", [244, 8, 70, 60], 0, 15, "EEEEEE", potId=3)
+ctrl(504, "fader", "BPM", [634, 8, 70, 60], 30, 300, "FF9100", potId=4)
 ctrl(601, "button", "PLAY", [322, 8, 60, 60], 0, 1, "76FF03")
 ctrl(602, "button", "STOP", [390, 8, 60, 60], 0, 1, "FF5252")
 ctrl(603, "button", "DIR", [458, 8, 70, 60], 0, 1, "40C4FF")
@@ -54,11 +73,18 @@ ctrl(605, "button", "CLK", [712, 8, 80, 60], 0, 1, "00E5FF")
 preset = {
     "version": 3,
     "name": "Activity Sequencer",
-    "devices": [],
+    "projectId": "ACTSEQE1",
+    "devices": [
+        {
+            "id": 1,
+            "name": "Seq Out",
+            "port": 1,
+            "channel": 1,
+        }
+    ],
     "pages": [{"id": 1, "name": "Activity Seq"}],
-    "controlSets": [{"id": 1, "name": "main"}],
-    "groups": [],
     "overlays": [],
+    "groups": [],
     "controls": controls,
 }
 
